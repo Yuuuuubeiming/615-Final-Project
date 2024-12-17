@@ -1,0 +1,601 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Haiti GDP composition, the data is from Wolrd Bank
+```{r}
+library(ggplot2)
+library(dplyr)
+data_clean <- read_csv("data_clean.csv")
+gdp_data <- data.frame(
+  Sector = c("Agriculture", "Services", "Industry", "Manufacturing"),
+  Percentage = c(20.28, 48.17, 29.34, 23.13)
+)
+
+graph1 <- ggplot(gdp_data, aes(x = Sector, y = Percentage, fill = Sector)) +
+  geom_bar(stat = "identity", width = 0.7, show.legend = FALSE) +
+  geom_text(aes(label = paste0(Percentage, "%")), 
+            vjust = -0.5, size = 5) +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(title = "GDP Composition %", x = "", y = "") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 18, hjust = 0),
+    axis.text = element_text(size = 12),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+graph2 <- ggplot(gdp_data, aes(x = "", y = Percentage, fill = Sector)) +
+      geom_bar(stat = "identity", width = 1) +
+      coord_polar(theta = "y") +
+      geom_text(aes(label = paste0(Percentage, "%")), 
+                position = position_stack(vjust = 0.5), size = 5) +
+      labs(title = "Haiti GDP Composition 2023 (%)", x = NULL, y = NULL, fill = "Sector") +
+      theme_void() +
+      theme(
+        plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 10)
+      )
+print(graph2)
+```
+Comparison of GDP Haiti and 
+```{r}
+unique(data_clean$Factor)
+GDP_data <- data_clean[data_clean$Factor == "GDP", ]
+ggplot(GDP_data, aes(x = Year, y = Value, color = Country_Code)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "GDp Trend",
+       x = "Year", y = "GDP(dollars)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+Comparison of life expectency
+```{r}
+life_expectancy_data <- data_clean[data_clean$Factor == "Life_expectancy", ]
+
+# Create the plot
+plot_life <- ggplot(life_expectancy_data, aes(x = Year, y = Value, color = Country_Code)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Life Expectancy Trend",
+       x = "Year", y = "Life Expectancy (Years)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+Comparison of Inflation rate
+```{r}
+Inflation_data <- data_clean[data_clean$Factor == "Inflation", ]
+ggplot(Inflation_data, aes(x = Year, y = Value, color = Country_Code)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Inflation Trend",
+       x = "Year", y = "Inflation rate(%)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+
+Comparison of Foreign_investment
+```{r}
+Invest_data <- data_clean[data_clean$Factor == "Foreign_investment", ]
+ggplot(Invest_data, aes(x = Year, y = Value, color = Country_Code)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Foreign Investment  Trend",
+       x = "Year", y = "Foreign Investment(%)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+
+Comparison of Haiti's national income
+```{r}
+Income_data <- data_clean[data_clean$Factor == "National_income", ]
+ggplot(Income_data, aes(x = Year, y = Value, color = Country_Code)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "National income Trend",
+       x = "Year", y = "National income") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+
+Comparison of Haiti's unemployment rate
+```{r}
+Job_data <- data_clean[data_clean$Factor == "Unemployment", ]
+ggplot(Income_data, aes(x = Year, y = Value, color = Country_Code)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Unemployment rate Trend",
+       x = "Year", y = "Unemployment rate") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+```{r}
+predict_data <- read.csv("predict_data_clean.csv")
+head(predict_data)
+GDP_data1 <- predict_data[predict_data$Factor == "GDP", ]
+gdp_ts <- ts(GDP_data1$Value, start = 1999, frequency = 1)
+library(forecast)
+
+# Fit an ARIMA model
+arima_model <- auto.arima(gdp_ts)
+
+# Forecast the next 5 years
+gdp_forecast <- forecast(arima_model, h = 5)
+
+# Plot the forecast
+gdp_forecast <- forecast(arima_model, h = 5)
+
+# Plot the forecast
+autoplot(gdp_forecast) +
+  labs(title = "GDP Forecast for Haiti",
+       x = "Year", y = "GDP") +
+  theme_minimal()
+
+summary(gdp_forecast)
+
+checkresiduals(gdp_forecast)
+```
+```{r}
+arima_improved <- auto.arima(gdp_ts, d = 1, max.p = 3, max.q = 3)
+summary(arima_improved)
+```
+```{r}
+# Convert Inflation data to a time series
+inflationdata1 <- predict_data[predict_data$Factor == "inflation", ]
+head(inflationdata1)
+inflation_ts <- ts(inflationdata1$Value, start = 1999, frequency = 1)
+
+# Fit ARIMA model for Inflation
+inflation_model <- auto.arima(inflation_ts)
+
+# Forecast the next 5 years for Inflation
+inflation_forecast <- forecast(inflation_model, h = 5)
+
+# Combine forecast data into a data frame
+inflation_combined <- data.frame(
+  Year = c(time(inflation_ts), time(inflation_forecast$mean)),
+  Inflation = c(as.numeric(inflation_ts), as.numeric(inflation_forecast$mean)),
+  Type = c(rep("Historical", length(inflation_ts)), rep("Forecast", length(inflation_forecast$mean)))
+)
+
+# Extract confidence intervals for Inflation
+inflation_conf <- data.frame(
+  Year = time(inflation_forecast$mean),
+  Lower = inflation_forecast$lower[, 2], # 95% lower bound
+  Upper = inflation_forecast$upper[, 2]  # 95% upper bound
+)
+
+ggplot() +
+    # Historical data
+    geom_line(data = subset(inflation_combined, Type == "Historical"), 
+              aes(x = Year, y = Inflation), color = "blue", size = 1.2) +
+    geom_point(data = subset(inflation_combined, Type == "Historical"), 
+               aes(x = Year, y = Inflation), color = "blue", size = 2) +
+    
+    # Forecasted data
+    geom_line(data = subset(inflation_combined, Type == "Forecast"), 
+              aes(x = Year, y = Inflation), color = "red", size = 1.2, linetype = "dashed") +
+    geom_point(data = subset(inflation_combined, Type == "Forecast"), 
+               aes(x = Year, y = Inflation), color = "red", size = 2) +
+    geom_ribbon(data = inflation_conf, aes(x = Year, ymin = Lower, ymax = Upper), 
+                fill = "grey70", alpha = 0.4) +
+    labs(title = "Historical and Forecasted Inflation Rate with Confidence Interval",
+         x = "Year", y = "Inflation Rate (%)") +
+    theme_minimal()
+```
+
+
+```{r}
+library(shiny)
+library(shinydashboard)
+library(leaflet)
+library(ggplot2)
+
+# GDP Data for Statistics Page
+gdp_data <- data.frame(
+  Sector = c("Agriculture", "Services", "Industry", "Manufacturing"),
+  Percentage = c(20.28, 48.17, 29.34, 23.13)
+)
+
+ui <- dashboardPage( 
+  dashboardHeader(title = "Republic of Haiti"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Home", tabName = "home", icon = icon("home")),
+      menuItem("Maps", tabName = "maps", icon = icon("globe")),
+      menuItem("Comparison", tabName = "comparison", icon = icon("table")),
+      menuItem("Prediction", tabName = "prediction", icon = icon("table"))
+    )
+  ),
+  dashboardBody(
+    tabItems(
+      # Home Page
+      tabItem(tabName = "home",
+              tabBox(
+                title = "", width = 12,
+                tabPanel("Overview",
+                         h3("Overview of Haiti"),
+                         p("Haiti, officially the Republic of Haiti, is a country located on the island of Hispaniola in the Greater Antilles archipelago of the Caribbean Sea. "
+                           ,"It shares the island with the Dominican Republic to the east. Haiti has an area of 27,750 km² and it may be considered quite a small country and a population of 11,447,569 people. It is ranked at 83 position by population of 196 countries and has a high population density, with 413 people per km². "
+                           ,"Haiti is also the first nation in the world to abolish slavery and gain independence through a slave-led revolution in 1804."),
+                         imageOutput("haiti_image"),
+                         p("This is an image of the Republic of Haiti.")
+                ),
+                tabPanel("Economics", 
+                         h3("Haiti Economy"),
+                         p("Haiti remains the poorest country in Latin America and the Caribbean, with a GDP per capita of $1,693 in 2023 and a Human Development Index of 0.552, ranking 158 out of 193 countries. Political instability, gang violence, and natural hazards have driven the economy into six consecutive years of contraction, with GDP declining by an estimated 4.2% in 2024. The peak of inflation existed in January 2023 which is 49.3%, and it remains high at 29.3% in August 2024."),
+                         imageOutput("haiti_image2")
+                ),
+                tabPanel("Industries", 
+                         h3("Main Industries in Haiti"),
+                         p("Although Haiti has significant potential for tourism and natural resources, it still remains one of the poorest nations in the Americas, facing challenges such as poverty, corruption, poor infrastructure. The devastating 2010 earthquake and subsequent cholera outbreak further hindered economic progress. Agriculture, once the backbone of Haiti's economy, has declined due to land fragmentation, outdated practices, ecological issues, and minimal investment. Coffee and sugarcane remain key cash crops, though coffee production has fallen since independence. Tourism, a major revenue source, generated $200 million in 2012, driven by Haiti's scenic coastline, cultural history, and climate, but is stifled by political instability. Mining, contributing $13 million in 2013, includes gold, copper, and marble, with a history dating back to Spanish colonization. Manufacturing, focused on cement, textiles, sugar processing, and soap, contributed 20% to GDP in 2004 but remains underdeveloped due to limited capital investment, despite international support."),
+                         fluidRow(
+                           column(width = 12,
+                           box(
+                             width = 12,
+                             radioButtons("chart_type", "Select Chart Type:", 
+                                          choices = c("Bar Chart" = "bar", "Pie Chart" = "pie"),
+                                          selected = "bar"),
+                             plotOutput("gdp_switch_chart")
+                           )
+                         )
+                )),
+                tabPanel("Natural Disaster", 
+                         h3("2010 Haiti earthquake"),
+                         p("The 2010 Haiti earthquake, a devastating 7.0 magnitude tremor, struck on January 12, 2010, near the capital Port-au-Prince, severely affecting Haiti, which occupies the western part of the island of Hispaniola. The earthquake caused catastrophic damage, resulting in an official death toll of over 300,000, though other estimates suggest a lower number. Hundreds of thousands were injured, and over a million survivors were displaced. The disaster destroyed critical infrastructure, including homes, schools, hospitals, and government buildings, leaving Haiti’s already fragile economy in ruins. The country faced a collapse in trade, widespread job losses, and an overwhelmed healthcare system, exacerbating poverty and inequality. The economic cost of the earthquake was estimated at $8–14 billion, equivalent to 120% of Haiti's GDP at the time. Rebuilding efforts were hindered by political instability, corruption, and limited international aid effectiveness, slowing recovery and leaving the country highly dependent on foreign assistance. The earthquake's long-term impact continues to impede economic development, keeping Haiti among the poorest nations in the world."),
+                         imageOutput("haiti_image3")
+                         )
+              )
+      ),
+      tabItem(tabName = "maps",
+              h2("Interactive Map of Haiti"),
+              leafletOutput("haiti_map", width = "100%", height = "600px")
+      ),
+
+#Comparison
+     tabItem(tabName = "comparison",
+              tabBox(
+                id = "comparison_tabs", width = 12,
+                
+                # Subtab 1: Life Expectancy
+                tabPanel("Life Expectancy",
+                         fluidRow(
+                           box(width = 12,
+                               h3("Life Expectancy Trend Across Countries"),
+                               plotOutput("LifeExpectancyPlot", height = "600px")
+                           )
+                         )
+                ),
+                
+                # Subtab 2: GDP
+                tabPanel("GDP",
+                         fluidRow(
+                           box(width = 12,
+                               h3("GDP Trend Across Countries"),
+                               plotOutput("GDPPlot", height = "600px")
+                           )
+                         )
+                ),
+                #tab3: inflation
+                tabPanel("Inflation",
+                         fluidRow(
+                           box(width = 12,
+                               h3("Inflation Trend Across Countries"),
+                               plotOutput("InflationPlot", height = "600px")
+                           )
+                         )
+                ),
+                #tab4: foreign investment
+                tabPanel("Foregin Investment",
+                         fluidRow(
+                           box(width = 12,
+                               h3("Foreign Investment Trend Across Countries"),
+                               plotOutput("InvestPlot", height = "600px")
+                           )
+                         )
+                ),
+                #tab5: National Income
+                tabPanel("National Income",
+                         fluidRow(
+                           box(width = 12,
+                               h3("National Income Trend Across Countries"),
+                               plotOutput("IncomePlot", height = "600px")
+                           )
+                         )
+                ),
+                #tab6: Unemployment rate
+                tabPanel("Unemployment Rate",
+                         fluidRow(
+                           box(width = 12,
+                               h3("Unemployment Rate Trend Across Countries"),
+                               plotOutput("JobPlot", height = "600px")
+                           )
+                         )
+                )
+              )
+      ),
+
+
+tabItem(tabName = "prediction",
+        tabBox(
+          id = "prediction_tabs", width = 12,
+          
+          # Tab 1: GDP Forecast
+          tabPanel("GDP Forecast",
+                   fluidRow(
+                     box(title = "GDP Forecast Visualization", 
+                         width = 12, 
+                         plotOutput("gdp_forecast_plot", height = "500px")
+                     )
+                   )
+          ),
+          
+          # Tab 2: Inflation Forecast
+          tabPanel("Inflation Forecast",
+                   fluidRow(
+                     box(title = "Inflation Forecast Visualization", 
+                         width = 12, 
+                         plotOutput("inflation_forecast_plot", height = "500px")
+                     )
+                   )
+          )
+        )
+)
+
+)))
+
+server <- function(input, output, session) {
+  # Render Haiti Images
+  output$haiti_image <- renderImage({
+    list(
+      src = "www/1.jpeg",
+      contentType = "image/jpeg",
+      width = "100%",
+      height = "400px"
+    )
+  }, deleteFile = FALSE)
+  
+  output$haiti_image2 <- renderImage({
+    list(
+      src = "www/3.jpeg",
+      contentType = "image/jpeg",
+      width = "100%",
+      height = "400px"
+    )
+  }, deleteFile = FALSE)
+  
+  output$haiti_image3 <- renderImage({
+    list(
+      src = "www/4.jpeg",
+      contentType = "image/jpeg",
+      width = "100%",
+      height = "400px"
+    )
+  }, deleteFile = FALSE)
+  
+  # GDP Switchable Chart (Bar or Pie)
+  output$gdp_switch_chart <- renderPlot({
+    if (input$chart_type == "bar") {
+      ggplot(gdp_data, aes(x = Sector, y = Percentage, fill = Sector)) +
+        geom_bar(stat = "identity", width = 0.7, show.legend = FALSE) +
+        geom_text(aes(label = paste0(Percentage, "%")), vjust = -0.5, size = 5) +
+        scale_y_continuous(limits = c(0, 100)) +
+        labs(title = "GDP Composition: Bar Chart", x = "", y = "Percentage") +
+        theme_minimal() +
+        theme(
+          plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+          axis.text = element_text(size = 12)
+        )
+    } else if (input$chart_type == "pie") {
+      ggplot(gdp_data, aes(x = "", y = Percentage, fill = Sector)) +
+        geom_bar(stat = "identity", width = 1) +
+        coord_polar(theta = "y") +
+        geom_text(aes(label = paste0(Percentage, "%")), 
+                  position = position_stack(vjust = 0.5), size = 5) +
+        labs(title = "GDP Composition: Pie Chart", x = NULL, y = NULL, fill = "Sector") +
+        theme_void() +
+        theme(
+          plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 10)
+        )
+    }
+  })
+  
+  # Comparison Table
+output$LifeExpectancyPlot <- renderPlot({
+  # Plot life expectancy for all countries
+  ggplot(life_expectancy_data, aes(x = Year, y = Value, color = Country_Name, group = Country_Name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    labs(x = "Year", y = "Life Expectancy (Years)", color = "Country") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+})
+# GDP Plot
+output$GDPPlot <- renderPlot({
+  ggplot(GDP_data, aes(x = Year, y = Value, color = Country_Name, group = Country_Name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    labs(x = "Year", y = "GDP (dollars)", color = "Country") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+})
+#Inflation Rate Plot
+output$InflationPlot <- renderPlot({
+  ggplot(Inflation_data, aes(x = Year, y = Value, color = Country_Name, group = Country_Name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    labs(x = "Year", y = "Inflation_rate", color = "Country") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+})
+#investment Plot
+output$InvestPlot <- renderPlot({
+  ggplot(Invest_data, aes(x = Year, y = Value, color = Country_Name, group = Country_Name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    labs(x = "Year", y = "Foreign Investment", color = "Country") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+})
+#Natinal income Plot
+output$IncomePlot <- renderPlot({
+  ggplot(Income_data, aes(x = Year, y = Value, color = Country_Name, group = Country_Name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    labs(x = "Year", y = "National Income", color = "Country") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+})
+
+#Natinal income Plot
+output$JobPlot <- renderPlot({
+  ggplot(Job_data, aes(x = Year, y = Value, color = Country_Name, group = Country_Name)) +
+    geom_line(size = 1.2) +
+    geom_point(size = 2) +
+    labs(x = "Year", y = "Unemployment rate", color = "Country") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+})
+#GDP Prediction
+output$gdp_forecast_plot <- renderPlot({
+  # Create combined historical and forecast plot
+  gdp_combined <- data.frame(
+    Year = c(time(gdp_ts), time(gdp_forecast$mean)),
+    GDP = c(as.numeric(gdp_ts), as.numeric(gdp_forecast$mean)),
+    Type = c(rep("Historical", length(gdp_ts)), rep("Forecast", length(gdp_forecast$mean)))
+  )
+  
+  gdp_conf <- data.frame(
+    Year = time(gdp_forecast$mean),
+    Lower = gdp_forecast$lower[, 2], # 95% lower confidence bound
+    Upper = gdp_forecast$upper[, 2]  # 95% upper confidence bound
+  )
+
+  # Plot with ggplot2
+  ggplot() +
+    # Historical data
+    geom_line(data = subset(gdp_combined, Type == "Historical"), 
+              aes(x = Year, y = GDP), color = "blue", size = 1.2) +
+    geom_point(data = subset(gdp_combined, Type == "Historical"), 
+               aes(x = Year, y = GDP), color = "blue", size = 2) +
+    
+    # Forecasted data
+    geom_line(data = subset(gdp_combined, Type == "Forecast"), 
+              aes(x = Year, y = GDP), color = "red", size = 1.2, linetype = "dashed") +
+    geom_point(data = subset(gdp_combined, Type == "Forecast"), 
+               aes(x = Year, y = GDP), color = "red", size = 2) +
+    
+    # Confidence intervals
+    geom_ribbon(data = gdp_conf, aes(x = Year, ymin = Lower, ymax = Upper), 
+                fill = "grey70", alpha = 0.4) +
+    
+    # Labels and theme
+    labs(title = "Historical and Forecasted GDP with Confidence Interval",
+         x = "Year", y = "GDP (USD)",
+         color = "Data Type") +
+    theme_minimal()
+})
+
+output$inflation_forecast_plot <- renderPlot({
+  ggplot() +
+    # Historical data
+    geom_line(data = subset(inflation_combined, Type == "Historical"), 
+              aes(x = Year, y = Inflation), color = "blue", size = 1.2) +
+    geom_point(data = subset(inflation_combined, Type == "Historical"), 
+               aes(x = Year, y = Inflation), color = "blue", size = 2) +
+    
+    # Forecasted data
+    geom_line(data = subset(inflation_combined, Type == "Forecast"), 
+              aes(x = Year, y = Inflation), color = "red", size = 1.2, linetype = "dashed") +
+    geom_point(data = subset(inflation_combined, Type == "Forecast"), 
+               aes(x = Year, y = Inflation), color = "red", size = 2) +
+    
+    # Confidence intervals
+    geom_ribbon(data = inflation_conf, aes(x = Year, ymin = Lower, ymax = Upper), 
+                fill = "grey70", alpha = 0.4) +
+    
+    # Labels and theme
+    labs(title = "Historical and Forecasted Inflation Rate with Confidence Interval",
+         x = "Year", y = "Inflation Rate (%)") +
+    theme_minimal()
+})
+  # Haiti Map
+  output$haiti_map <- renderLeaflet({
+    leaflet() %>%
+      addTiles() %>%  
+      setView(lng = -72.2852, lat = 18.9712, zoom = 7) %>%  
+      addMarkers(lng = -72.2852, lat = 18.9712, popup = "Haiti: Port-au-Prince")
+  })
+}
+
+shinyApp(ui, server)
+
+
+```
+
+
+
